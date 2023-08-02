@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect
 from .models import Company, Restaurant, Menu, Employee, Vote, User
 from .serializers import *
 from .services import get_current_day_menu, get_results_for_current_day
+from datetime import date
 
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
@@ -37,16 +38,19 @@ class VoteViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+@login_required
 @api_view(['GET'])
 def get_current_day_menu_view(request):
-    menu = get_current_day_menu()
-    if menu is not None:
-        serializer = MenuSerializer(menu)
-        return Response(serializer.data)
+    menu = Menu.objects.filter(date=date.today())
+    existing_restaurant_ids = [m.restaurant.id for m in menu]
+    restaurants = Restaurant.objects.exclude(id__in=existing_restaurant_ids)
+    if menu is not None or restaurants is not None:
+        return render(request, 'menu/today_menu.html', {'restaurants':restaurants, 'menu':menu})
     else:
         # Handle the case where the menu for the current day is not available
         return Response({"message": "Menu not available for the current day"}, status=status.HTTP_404_NOT_FOUND)
 
+@login_required
 @api_view(['GET'])
 def get_results_for_current_day_view(request):
     results = get_results_for_current_day()

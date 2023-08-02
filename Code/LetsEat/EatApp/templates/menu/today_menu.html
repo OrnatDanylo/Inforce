@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Menu</title>
+</head>
+<body>
+    <h1>Сьогодні в програмі</h1>
+
+    <ul> 
+    {% for restaurant in restaurants %}
+        <li>
+            <strong>Menu: {{ restaurant.default_Meun }}</strong><br>         
+        </li>
+    {% endfor %}
+
+    {% for m in menu %}
+        <li>
+            <strong>Menu: {{ m.items }}</strong><br>         
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
