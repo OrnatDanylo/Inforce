@@ -53,8 +53,12 @@ def get_current_day_menu_view(request):
 @login_required
 @api_view(['GET'])
 def get_results_for_current_day_view(request):
-    results = get_results_for_current_day()
-    return Response(results)
+    menu = Menu.objects.filter(date=date.today()).order_by('-rate')
+    if menu is not None:
+        return render(request, 'menu/today_menu_rating.html', {'menu':menu})
+    else:
+        # Handle the case where the menu for the current day is not available
+        return Response({"message": "Menu not available for the current day"}, status=status.HTTP_404_NOT_FOUND)
 
 #registration section
 @api_view(['GET', 'POST'])
@@ -142,8 +146,23 @@ def upload_menu(request, restaurant_id):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-    else:
+    else:    
         return render(request, 'menu/upload_menu.html', {'restaurant_id':restaurant_id})
+    
+@login_required    
+@api_view(['POST','PUT'])
+def upload_menu_put(request, menu_id):
+    try:
+        menu = Menu.objects.get(pk=menu_id)
+
+        # Increase the menu rating
+        menu.rate += 1
+        menu.save()
+
+        return Response({'message': 'Rating increased successfully.'}, status=status.HTTP_200_OK)
+
+    except Menu.DoesNotExist:
+        return Response({'error': 'Menu not found.'}, status=status.HTTP_404_NOT_FOUND)
 
 
     

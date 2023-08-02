@@ -24,4 +24,6 @@ urlpatterns = [
 
     path('restaurant/create/', create_restaurant, name='create_restaurant'),
     path('restaurants/<int:restaurant_id>/upload_menu/', upload_menu, name='upload_menu'),
+    path('restaurants/upload_menu/<int:menu_id>/', upload_menu_put, name='upload_menu_put'),
+    
 ]

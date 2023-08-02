@@ -4,27 +4,20 @@
     <title>Menu</title>
 </head>
 <body>
-    <h1>Сьогодні в програмі</h1>
+    <h1>Гарячі пропозиції</h1>
 
     <ul> 
 
     {% for m in menu %}
         <li>
-            <strong>Menu: {{ m.items }}</strong><br>      
+            <strong>Menu: {{ m.items }}</strong><br>   
+            <strong>Rate: {{ m.rate }}</strong><br>     
             <form method="post" action="{% url 'upload_menu_put' menu_id=m.id %}">
                 {% csrf_token %}
                 <input type="hidden" name="_method" value="PUT">
-                <button type="submit">Vote</button>
             </form>   
         </li>
     {% endfor %}
-
-    {% for restaurant in restaurants %}
-        <li>
-            <strong>Menu: {{ restaurant.default_Meun }}</strong><br>         
-        </li>
-    {% endfor %}
-
 
     </ul>
 </body>
