@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Menu</title>
+</head>
+<body>
+    <h1>Upload Menu for Restaurant</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="restaurant_id" value="{{ restaurant_id }}">
+        <label for="date">Date:</label>
+        <input type="date" name="date" required>
+        <br>
+        <label for="items">Items:</label>
+        <textarea name="items" required></textarea>
+        <br>
+        <input type="submit" value="Upload Menu">
+    </form>
+</body>
+</html>

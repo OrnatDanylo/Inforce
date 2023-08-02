@@ -67,3 +67,14 @@ class CreateRestaurantSerializer(serializers.ModelSerializer):
         company = self.context.get('company')
         restaurant = Restaurant.objects.create(company=company, **validated_data)
         return restaurant    
+    
+
+class UploadManuSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Menu
+        exclude = ('restaurant',)
+
+    def create(self, validated_data):
+        restaurant = self.context.get('restaurant')
+        menu = Menu.objects.create(restaurant=restaurant, **validated_data)
+        return menu        

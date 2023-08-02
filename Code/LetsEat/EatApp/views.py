@@ -127,6 +127,20 @@ def create_restaurant(request):
         return Response(serializer.errors, status=400)
     else:
         return render(request, 'restaurant/create_restaurant.html')
+    
+@login_required    
+@api_view(['GET','POST'])
+def upload_menu(request, restaurant_id):
+    if request.method == 'POST':
+        restaurant = Restaurant.objects.get(pk=restaurant_id)
+        serializer = UploadManuSerializer(data=request.data, context={'restaurant': restaurant})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    else:
+        return render(request, 'menu/upload_menu.html', {'restaurant_id':restaurant_id})
+
 
     
 @login_required

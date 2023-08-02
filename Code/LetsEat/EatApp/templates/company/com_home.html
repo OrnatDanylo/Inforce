@@ -13,6 +13,8 @@
             <strong>{{ restaurant.name }}</strong><br>
             Address: {{ restaurant.address }}<br>
             Default Menu: {{ restaurant.default_Meun }}
+            <br>
+            <a href="{% url 'upload_menu' restaurant.id %}">Upload Menu</a>
         </li>
     {% endfor %}
     </ul>
