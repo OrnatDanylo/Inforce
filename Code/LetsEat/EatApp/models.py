@@ -16,6 +16,7 @@ class Menu(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     date = models.DateField()
     items = models.TextField()
+    rate = models.IntegerField(default=0, null = False)
 
     class Meta:
         unique_together = ('restaurant', 'date',)
