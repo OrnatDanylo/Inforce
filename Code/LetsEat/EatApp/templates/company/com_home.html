@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ company.name }} - Restaurants</title>
+</head>
+<body>
+    <h1>{{ company.name }} - Restaurants</h1>
+
+    <h2>Existing Restaurants</h2>
+    <ul> 
+    {% for restaurant in restaurants %}
+        <li>
+            <strong>{{ restaurant.name }}</strong><br>
+            Address: {{ restaurant.address }}<br>
+            Default Menu: {{ restaurant.default_Meun }}
+        </li>
+    {% endfor %}
+    </ul>
+
+    <a href="{% url 'create_restaurant' %}">Create New Restaurant</a>
+
+</body>
+</html>

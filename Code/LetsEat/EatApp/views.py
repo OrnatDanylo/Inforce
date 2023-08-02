@@ -1,9 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import Company, Restaurant, Menu, Employee, Vote, User
-from .serializers import CompanySerializer, RestaurantSerializer, MenuSerializer, EmployeeSerializer, VoteSerializer, EmployeeRegistrationSerializer
+from .serializers import *
 from .services import get_current_day_menu, get_results_for_current_day
 
 class CompanyViewSet(viewsets.ModelViewSet):
@@ -49,6 +52,7 @@ def get_results_for_current_day_view(request):
     results = get_results_for_current_day()
     return Response(results)
 
+#registration section
 @api_view(['GET', 'POST'])
 def employee_registration_view(request):
     if request.method == 'POST':
@@ -60,3 +64,74 @@ def employee_registration_view(request):
         return Response(serializer.errors, status=400)
     else:
         return render(request, 'employee/register_employee.html')
+
+#login section    
+class MyTokenObtainPairView(TokenObtainPairView):
+    pass    
+
+def login_view(request):
+    return render(request, 'authentication/login.html')
+
+@api_view(['GET','POST'])
+def login_view(request):
+    if request.method == 'POST':
+        
+        user = authenticate(username=request.data['username'], password=request.data['password'])
+        if user is None:
+            return Response({"error": "Invalid username or password."}, status=400)
+        #login
+        login(request, user)
+
+        request.session['username'] = request.data['username']
+
+        if Employee.objects.filter(user__username=request.data['username']).exists():
+            print(request)
+            return redirect('employee/home/')
+        elif Company.objects.filter(owner__username=request.data['username']).exists():
+            print(request)
+            return redirect('company/home/')  
+        else:    
+            return Response({"error": "Invalid user."}, status=400)
+    else:
+        return render(request, 'authentication/login.html')
+
+#home screen
+@login_required
+@api_view(['GET'])
+def company_home(request):
+    username = request.session.get('username', '')
+    try:
+        company =  Company.objects.filter(owner__username = username).first()
+        restaurants = Restaurant.objects.filter(company=company)
+    except Company.DoesNotExist:
+        company = None
+        restaurants = []
+    
+    context = {
+        'company': company,
+        'restaurants': restaurants,
+    }
+    return render(request, 'company/com_home.html', context)   
+
+
+@login_required
+@api_view(['GET','POST'])
+def create_restaurant(request):
+    if request.method == 'POST':
+        print(request.data)
+        company =  Company.objects.filter(owner__username = request.session.get('username', '')).first()
+        serializer = CreateRestaurantSerializer(data=request.data, context={'company': company})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    else:
+        return render(request, 'restaurant/create_restaurant.html')
+
+    
+@login_required
+@api_view(['GET'])
+def employee_home(request):
+    username = request.session.get('username', '')
+    return render(request, 'employee/emp_home.html')   
+        

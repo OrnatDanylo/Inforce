@@ -11,6 +11,7 @@ class RestaurantSerializer(serializers.ModelSerializer):
         model = Restaurant
         fields = '__all__'
 
+
 class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
@@ -56,3 +57,13 @@ class EmployeeRegistrationSerializer(serializers.ModelSerializer):
         }
         employee = Employee.objects.create(**employee_data)
         return employee
+    
+class CreateRestaurantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Restaurant
+        exclude = ('company',)
+
+    def create(self, validated_data):
+        company = self.context.get('company')
+        restaurant = Restaurant.objects.create(company=company, **validated_data)
+        return restaurant    
